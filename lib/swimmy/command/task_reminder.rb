@@ -4,6 +4,43 @@ require "time"
 module Swimmy
   module Command
     class TaskReminder < Swimmy::Command::Base
+      class Task
+        def initialize(content, description, due_at, creator, assigner, url)
+          @content = content
+          @description = description
+          @due_at = due_at
+          @creator = creator
+          @assigner = assigner
+          @url = url
+        end
+
+        def self.from_json(task_json)
+          content = task_json["content"]
+          description = task_json["description"]
+          due_at = DateTime.parse(task_json["due_at"])
+          creator = task_json["creator"]
+          assigner = task_json["assigner"]
+          url = task_json["url"]
+          new(content, description, due_at, creator, assigner, url)
+        end
+
+        def due_at
+          @due_at
+        end
+
+        def to_s
+        # タスクのキーを1つずつ取り出して表示
+        <<~TEXT
+          タスク: #{@content}
+          説明: #{@description}
+          期限: #{@due_at.strftime('%Y年%m月%d日%H時%M分')}
+          作成者: #{@creator}
+          担当者: #{@assigner}
+          URL: #{@url}
+        TEXT
+        end
+    end
+
       command "task_reminder" do |client, data, match|
         # rask-cliを $ cargo run task listして
         # タスクのリストを取得する
@@ -11,29 +48,31 @@ module Swimmy
         tasks = JSON.parse(cli_tasks)
         puts "------------------------------------------------------------------------------------"
         # ループですべてのリストの due_at と現在日時を比べる
-            # 現在日時から1週間後の日時を取得
-            # その日時とタスクの日時を比較
-            # 1週間以内のものを表示する
-        current_day = Time.now
-        one_week = current_day + 7 * 86400
+          # 現在日時から1週間後の日時を取得
+          # その日時とタスクの日時を比較
+          # 1週間以内のものを表示する
+        current_day = DateTime.now
+        # puts current_day
+        one_week = current_day + 7
+        # puts one_week
 
-        task_one_week = []
-        tasks.each do |task|
-          due_at = Time.parse(task["due_at"])
-          if due_at < one_week
-            task_one_week << task
-            p task_one_week
+        puts "期限が1週間以内のタスクを表示します"
+        tasks.each do |t|
+          task = Task.from_json(t)
+          # puts task.due_at
+          # puts task.to_s
+          if task.due_at < one_week
+            puts task.to_s
+            client.say(channel: data.channel, text: task.to_s)
           end
         end
         puts "------------------------------------------------------------------------------------"
-
-        client.say(channel: data.channel, text: task_one_week)
       end
       
       help do
         title "task_reminder"
         desc "タスクリマインダー"
-        long_desc ""
+        long_desc "期限が1週間以内のタスクを表示する"
       end #help
     end #class TaskReminder    
   end #module Command
