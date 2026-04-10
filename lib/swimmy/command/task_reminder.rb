@@ -44,7 +44,7 @@ module Swimmy
       command "task_reminder" do |client, data, match|
         # rask-cliを $ cargo run task listして
         # タスクのリストを取得する
-        cli_tasks = IO.popen(["/path/to/your/rask-cli", "task", "list"], &:read) # 実際に使用するときのパスは検討する
+        cli_tasks = IO.popen(["/home/hamazaki/git/rask-cli/target/debug/rask-cli", "task", "list"], &:read) # 実際に使用するときのパスは検討する
         tasks = JSON.parse(cli_tasks)
         puts "------------------------------------------------------------------------------------"
         # ループですべてのリストの due_at と現在日時を比べる
@@ -56,17 +56,18 @@ module Swimmy
         one_week = current_day + 7
         # puts one_week
 
-        puts "期限が1週間以内のタスクを表示します"
+        msg_info = "期限が1週間以内のタスクを表示します\n"
+        msg = ""
         tasks.each do |t|
           task = Task.from_json(t)
-          # puts task.due_at
-          # puts task.to_s
           if task.due_at < one_week
-            puts task.to_s
-            client.say(channel: data.channel, text: task.to_s)
+            msg << task.to_s
           end
         end
+        total_msg = msg_info + msg
+        puts total_msg
         puts "------------------------------------------------------------------------------------"
+        client.say(channel: data.channel, text: total_msg)
       end
       
       help do
