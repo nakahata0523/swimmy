@@ -5,23 +5,19 @@ module Swimmy
   module Command
     class TaskReminder < Swimmy::Command::Base
       class Task
-        def initialize(content, description, due_at, creator, assigner, url)
+        def initialize(content, due_at, assigner, url)
           @content = content
-          @description = description
           @due_at = due_at
-          @creator = creator
-          @assigner = assigner
-          @url = url
+          @name = assigner["name"]
+          @url = url.sub(/.json$/, "")
         end
 
         def self.from_json(task_json)
           content = task_json["content"]
-          description = task_json["description"]
           due_at = task_json["due_at"] ? DateTime.parse(task_json["due_at"]) : nil # task_json["due_at"]があればDateTimeにパース, なければ nil 
-          creator = task_json["creator"]
           assigner = task_json["assigner"]
           url = task_json["url"]
-          new(content, description, due_at, creator, assigner, url)
+          new(content, due_at, assigner, url)
         end
 
         def due_at
@@ -31,15 +27,12 @@ module Swimmy
         def to_s
         # タスクのキーを1つずつ取り出して表示
         <<~TEXT
-          タスク: #{@content}
-          説明: #{@description}
-          期限: #{@due_at ? @due_at.strftime('%Y年%m月%d日%H時%M分') : "未設定"}
-          作成者: #{@creator}
-          担当者: #{@assigner}
-          URL: #{@url}
+          #{@name} さん
+              タスク：#{@content} の期限は【#{@due_at ? @due_at.strftime('%Y年%m月%d日%H時%M分') : "未設定"}】までです．
+              #{@url} から確認して下さい．
         TEXT
         end
-    end
+      end
 
       command "task_reminder" do |client, data, match|
         # rask-cliを $ cargo run task listして
@@ -47,21 +40,19 @@ module Swimmy
         cli_tasks = IO.popen(["/path/to/your/rask-cli", "task", "list"], &:read) # 実際に使用するときのパスは検討する
         tasks = JSON.parse(cli_tasks)
         puts "------------------------------------------------------------------------------------"
-        current_day = DateTime.now
-        one_week = current_day + 7
+        now = DateTime.now
+        next_week = now + 7
 
-        msg_info = "期限が1週間以内のタスクを表示します\n"
         msg = ""
         tasks.each do |t|
         task = Task.from_json(t)
-        if task.due_at && task.due_at < one_week
+        if task.due_at && task.due_at < next_week
           msg << task.to_s
         end
       end
-      total_msg = msg_info + msg
-      puts total_msg
+      puts msg
       puts "------------------------------------------------------------------------------------"
-        client.say(channel: data.channel, text: total_msg)
+        client.say(channel: data.channel, text: msg)
       end
       
       help do
