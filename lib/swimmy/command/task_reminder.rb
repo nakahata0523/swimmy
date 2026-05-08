@@ -20,32 +20,30 @@ module Swimmy
           new(content, due_at, assigner, url)
         end
 
-        def due_at
-          @due_at
-        end
-
         def to_s
-        # タスクのキーを1つずつ取り出して表示
+        # タスクを箇条書きで表示する
+          # タスクの期限日時と現在日時の差を計算する
           now = DateTime.now
           diff_days = @due_at - now
           diff_hours = diff_days * 24
 
           days_left = diff_days.to_i
           hours_left = (diff_hours % 24).to_i
-          <<~TEXT
-             <#{@url}|#{@content}>（あと#{days_left}日#{hours_left}時間）
-           TEXT
+
+          # 期限まで1週間以内か過ぎている場合，太字で表示する
+          if days_left < 7
+            " *<#{@url}|#{@content}>* （あと *#{days_left}日#{hours_left}時間* ）\n"
+          else
+            " <#{@url}|#{@content}> （あと #{days_left}日#{hours_left}時間 ）\n"
+          end
         end
       end
 
       command "task_reminder" do |client, data, match|
-        # rask-cliを $ cargo run task listして
-        # タスクのリストを取得する
+        # $ ./rask-cli task list を実行してタスク一覧を取得する
+        # 取得したデータをハッシュ形式に変換後，表示するメッセージを作成
         cli_tasks = IO.popen(["/path/to/your/rask-cli", "task", "list"], &:read) # 実際に使用するときのパスは検討する
         tasks = JSON.parse(cli_tasks)
-        puts "------------------------------------------------------------------------------------"
-        now = DateTime.now
-        next_week = now + 7
 
         count = 1;
         msg = ""
@@ -54,8 +52,6 @@ module Swimmy
             msg << "#{count}. #{task.to_s}"
           count += 1
         end
-        puts msg
-        puts "------------------------------------------------------------------------------------"
         client.say(channel: data.channel, text: msg)
       end
 
