@@ -26,11 +26,15 @@ module Swimmy
 
         def to_s
         # タスクのキーを1つずつ取り出して表示
-        <<~TEXT
-          #{@name} さん
-              タスク：#{@content} の期限は【#{@due_at ? @due_at.strftime('%Y年%m月%d日%H時%M分') : "未設定"}】までです．
-              #{@url} から確認して下さい．
-        TEXT
+          now = DateTime.now
+          diff_days = @due_at - now
+          diff_hours = diff_days * 24
+
+          days_left = diff_days.to_i
+          hours_left = (diff_hours % 24).to_i
+          <<~TEXT
+             <#{@url}|#{@content}>（あと#{days_left}日#{hours_left}時間）
+           TEXT
         end
       end
 
@@ -43,22 +47,22 @@ module Swimmy
         now = DateTime.now
         next_week = now + 7
 
+        count = 1;
         msg = ""
         tasks.each do |t|
-        task = Task.from_json(t)
-        if task.due_at && task.due_at < next_week
-          msg << task.to_s
+          task = Task.from_json(t)
+            msg << "#{count}. #{task.to_s}"
+          count += 1
         end
-      end
-      puts msg
-      puts "------------------------------------------------------------------------------------"
+        puts msg
+        puts "------------------------------------------------------------------------------------"
         client.say(channel: data.channel, text: msg)
       end
-      
+
       help do
         title "task_reminder"
         desc "タスクリマインダー"
-        long_desc "期限が1週間以内のタスクを表示する"
+        long_desc "タスクと期限までの日数を表示する"
       end #help
     end #class TaskReminder    
   end #module Command
