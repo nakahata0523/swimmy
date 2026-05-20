@@ -28,13 +28,13 @@ module Swimmy
         days_left = diff_days.to_i
         hours_left = (diff_hours % 24).to_i
 
-        # 期限まで1週間以内か過ぎている場合，太字で表示する
+        # 期限まで1週間以内，もしくは過ぎている場合，太字で表示する
         if days_left < 7
             " *<#{@url}|#{@content}>* （あと *#{days_left}日#{hours_left}時間* ）\n"
         else
             " <#{@url}|#{@content}> （あと #{days_left}日#{hours_left}時間 ）\n"
         end
       end # to_s
-    end # Task
-  end # Resouce
-end # Swimmy
+    end # class Task
+  end # module Resouce
+end # module Swimmy
