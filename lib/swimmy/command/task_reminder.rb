@@ -9,12 +9,17 @@ module Swimmy
         cli_tasks = IO.popen(["/path/to/your/rask-cli", "task", "list"], &:read) # 実際に使用するときのパスは検討する
         tasks = JSON.parse(cli_tasks)
 
-        count = 1;
         msg = ""
-        tasks.each do |t|
-          task = Swimmy::Resource::Task.from_json(t)
+        case match[:expression]
+        when nil
+          count = 1;
+          tasks.each do |t|
+            task = Swimmy::Resource::Task.from_json(t)
             msg << "#{count}. #{task.to_s}"
-          count += 1
+            count += 1
+          end
+        else
+          msg << "引数は必要ありません．"
         end
         client.say(channel: data.channel, text: msg)
       end
