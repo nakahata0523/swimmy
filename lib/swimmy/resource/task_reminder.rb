@@ -1,4 +1,4 @@
-require "time"
+require "date"
 
 module Swimmy
   module Resource
@@ -12,15 +12,13 @@ module Swimmy
 
       def self.from_json(task_json)
         content = task_json["content"]
-        due_at = task_json["due_at"] ? DateTime.parse(task_json["due_at"]) : nil # task_json["due_at"]があればDateTimeにパース, なければ nil 
+        due_at = task_json["due_at"] ? DateTime.parse(task_json["due_at"]) : nil
         assigner = task_json["assigner"]
         url = task_json["url"]
         new(content, due_at, assigner, url)
       end
 
       def to_s
-      # タスクを箇条書きで表示する
-        # タスクの期限日時と現在日時の差を計算する
         now = DateTime.now
         diff_days = @due_at - now
         diff_hours = diff_days * 24
@@ -28,11 +26,12 @@ module Swimmy
         days_left = diff_days.to_i
         hours_left = (diff_hours % 24).to_i
 
-        # 期限まで1週間以内，もしくは過ぎている場合，太字で表示する
-        if days_left < 7
-            " *<#{@url}|#{@content}>* （あと *#{days_left}日#{hours_left}時間* ）\n"
+        if days_left >= 0 && days_left < 7
+          " *<#{@url}|#{@content}>* （あと *#{days_left}日#{hours_left}時間* ）\n"
+        elsif days_left < 0
+          " _<#{@url}|#{@content}>_ （あと _#{days_left}日#{hours_left}時間_ ）\n"
         else
-            " <#{@url}|#{@content}> （あと #{days_left}日#{hours_left}時間 ）\n"
+          " <#{@url}|#{@content}> （あと #{days_left}日#{hours_left}時間 ）\n"
         end
       end # to_s
     end # class Task
