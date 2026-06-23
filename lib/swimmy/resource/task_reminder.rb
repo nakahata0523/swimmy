@@ -26,12 +26,12 @@ module Swimmy
         days_left = diff_days.to_i
         hours_left = (diff_hours % 24).to_i
 
-        if days_left >= 0 && days_left < 7
-          " *<#{@url}|#{@content}>* （あと *#{days_left}日#{hours_left}時間* ）\n"
-        elsif days_left < 0
-          " _<#{@url}|#{@content}>_ （あと _#{days_left}日#{hours_left}時間_ ）\n"
+        if days_left < 0
+          " _<#{@url}|#{@content}> (期限超過: #{days_left}日#{hours_left}時間_ )\n"
+        elsif days_left >= 0 && days_left < 7
+          " *<#{@url}|#{@content}>* （期限まで: *#{days_left}日#{hours_left}時間* ）\n"
         else
-          " <#{@url}|#{@content}> （あと #{days_left}日#{hours_left}時間 ）\n"
+          " <#{@url}|#{@content}> （期限まで: #{days_left}日#{hours_left}時間 ）\n"
         end
       end # to_s
     end # class Task
