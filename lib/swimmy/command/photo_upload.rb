@@ -18,7 +18,9 @@ module Swimmy
         if data.files
           data.files.each do |file|
             next unless ["jpg", "png"].include?(file.filetype)
-            client.say(channel: data.channel, text: "Google Photos にアップロード中 (#{file.name})...")
+            client.say(channel: data.channel,
+                       text: "Google Photos にアップロード中 (#{file.name})...",
+                       thread_ts: data.thread_ts || data.ts)
 
             # NOTE: We cannot use threads to upload multiple photos asynchronously.
             # This is because Google Photos API returns 429 (Too Many Requests)
@@ -33,9 +35,11 @@ module Swimmy
                 end
               blob = SlackFileDownloader.new(ENV["SLACK_BOT_TOKEN"]).fetch(file.url_private_download)
               url = GooglePhotosUploader.new(google_oauth).upload(blob, file.name, data.text)
-              client.say(channel: data.channel, text: "アップロード完了 #{url}")
+              client.say(channel: data.channel,
+                         text: "アップロード完了 #{url}",
+                         thread_ts: data.thread_ts || data.ts)
             rescue
-              message = '写真のアップロードに失敗しました．'
+              message = "写真のアップロードに失敗しました (ファイル名: #{file.name})．"
               client.say(channel: data.channel, text: message)
             end
           end
