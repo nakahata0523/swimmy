@@ -23,7 +23,16 @@ module Swimmy
     autoload :BookmarkEntry, "#{dir}/bookmark.rb"
     autoload :CalendarEvent, "#{dir}/calendar_event.rb"
     autoload :ArtistInfo , "#{dir}/artist_info.rb"
+<<<<<<< HEAD
+=======
+    autoload :Homework,    "#{dir}/homework.rb"
+    autoload :IdName,      "#{dir}/id_name.rb"
+    autoload :Task,        "#{dir}/task.rb"
+    autoload :Document,    "#{dir}/document.rb"
+    autoload :User,        "#{dir}/user.rb"
+    autoload :Project,     "#{dir}/project.rb"
     autoload :RTaskToGc, "#{dir}/rtask_to_gc.rb"
     autoload :RTask, "#{dir}/rtask.rb"
+>>>>>>> feat/rask-cli
   end
 end
