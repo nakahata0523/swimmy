@@ -25,6 +25,6 @@ module Swimmy
     autoload :GoogleCalendar, "#{dir}/schedule_service.rb"
     autoload :Spotify, "#{dir}/spotify.rb"
     autoload :Homework, "#{dir}/homework.rb"
-    autoload :RaskCliDriver, "#{dir}/rask_cli_driver.rb"
+    autoload :Rask, "#{dir}/rask.rb"
   end
 end

@@ -1,8 +1,8 @@
 require "open3"
 require "json"
 
-RSpec.describe Swimmy::Service::RaskCliDriver do
-  let(:driver) { Swimmy::Service::RaskCliDriver }
+RSpec.describe Swimmy::Service::Rask do
+  let(:driver) { Swimmy::Service::Rask }
   let(:success_status) { instance_double(Process::Status, success?: true) }
   let(:failure_status) { instance_double(Process::Status, success?: false) }
 
@@ -155,7 +155,7 @@ RSpec.describe Swimmy::Service::RaskCliDriver do
         .and_return(["", "boom", failure_status])
 
       expect { driver.task_list }.to raise_error(
-        Swimmy::Service::RaskCliDriver::CommandFailedError, /boom/
+        Swimmy::Service::Rask::CommandFailedError, /boom/
       )
     end
 
