@@ -9,9 +9,9 @@ module Swimmy
     # JSON, so callers never need to think about the CLI's output format.
     #
     # Usage (called as class methods, no need to instantiate):
-    #   Swimmy::Service::RaskCliDriver.task_list(username)
-    #   Swimmy::Service::RaskCliDriver.document_list(content: ["title"])
-    class RaskCliDriver
+    #   Swimmy::Service::Rask.task_list(username)
+    #   Swimmy::Service::Rask.document_list(content: ["title"])
+    class Rask
       class CommandFailedError < StandardError; end
 
       class << self

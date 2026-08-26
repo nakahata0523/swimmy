@@ -38,9 +38,9 @@ module Swimmy
       end
 
       # You can use rask-cli driver in your command
-      # e.g. driver.task_list(username, is_json)
+      # e.g. driver.task_list(username)
       def self.driver
-        Swimmy::Service::RaskCliDriver
+        Swimmy::Service::Rask
       end
 
       # Create help_message for your command.
