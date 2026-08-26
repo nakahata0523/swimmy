@@ -10,7 +10,7 @@ module Swimmy
       class ParseError < StandardError; end
 
       def self.driver
-        Swimmy::Driver::RaskCliDriver
+        Swimmy::Service::RaskCliDriver
       end
 
       # タイトルからホームワークを取得

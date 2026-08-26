@@ -1,12 +1,12 @@
 require 'open3'
 
 module Swimmy
-  module Driver
+  module Service
     # Thin wrapper around the rask-cli binary (rask/cli).
     #
     # Usage (called as class methods, no need to instantiate):
-    #   Swimmy::Driver::RaskCliDriver.task_list(username, is_json)
-    #   Swimmy::Driver::RaskCliDriver.document_list(content: ["title"], json: true)
+    #   Swimmy::Service::RaskCliDriver.task_list(username, is_json)
+    #   Swimmy::Service::RaskCliDriver.document_list(content: ["title"], json: true)
     class RaskCliDriver
       class CommandFailedError < StandardError; end
 
