@@ -10,12 +10,12 @@ module Swimmy
       class ParseError < StandardError; end
 
       def self.driver
-        @driver ||= Swimmy::Driver::RaskCliDriver.new
+        Swimmy::Driver::RaskCliDriver
       end
 
       # タイトルからホームワークを取得
       def self.get_homeworks_by_title(title)
-        result = driver.fetch_documents(title)
+        result = driver.document_list(content: [title], is_json: true)
         extract_homeworks(result)
       end
 
