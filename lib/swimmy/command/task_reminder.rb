@@ -1,4 +1,5 @@
 require 'json'
+require "sheetq"
 require 'swimmy/service/task_reminder'
 
 module Swimmy
@@ -6,17 +7,27 @@ module Swimmy
     class TaskReminder < Swimmy::Command::Base
       command "task_reminder" do |client, data, match|
         begin
-          rask_cli_path = ENV["RASK_CLI_PATH"]
-          tasks_json = `#{rask_cli_path} task list`
-          tasks_hash = JSON.parse(tasks_json)
+          executor_slack_name = client.web_client.users_info(user: data.user).user.profile.display_name
+          rask_members = spreadsheet.sheet("members", Swimmy::Resource::Member).fetch
+          exec_member = rask_members.find {|m| m.account == executor_slack_name}
+          executor_github_name = exec_member&.github
 
-          exec_user_slack_name = client.web_client.users_info(user: data.user).user.profile.display_name
-          exec_user_github_name = Swimmy::Service::NameConverter.slack_to_github(spreadsheet, exec_user_slack_name)
+          msg = ""
+          tasks_list = Swimmy::Service::TaskFinder.find_tasks(executor_github_name)
 
-          expression = match[:expression]
-          msg = Swimmy::Service::MsgGenerator.msg_generate(expression, tasks_hash, exec_user_github_name)
+          if match[:expression]
+            msg << "引数は必要ありません．実行した人のタスクのみ表示します．\n\n"
+          end
+
+          if tasks_list.empty?
+            return msg << "タスクはありません．\n"
+          else
+            tasks_list.each_with_index do |task, i|
+              msg << "#{i + 1}. #{task.to_s}"
+            end
+          end
         rescue => e
-          msg = "タスク取得中にエラーが発生しました．(詳細: #{e.message})"
+          msg = "タスク取得中にエラーが発生しました．(詳細: #{e.message})\n"
         end
         client.say(channel: data.channel, text: msg)
       end
