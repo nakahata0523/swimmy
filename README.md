@@ -52,6 +52,9 @@ swimmyとは，B4新人課題で作成した各々のSlackBotを1つにまとめ
 
   - 取得したAPIキーを.envに記述する．
 
+  - Rask CLI との連携
+    - `homework` コマンド等が利用する [RaskCliDriver](docs/rask_cli_driver.md) を使うには，[rask/cli](https://github.com/nomlab/rask/tree/main/cli) をビルドし，`RASK_CLI_DIR`・`RASK_API_KEY`・`RASK_URL` を.envに設定する．詳細は [docs/rask_cli_driver.md](docs/rask_cli_driver.md) を参照．
+
 - sheetqの設定
   - [https://github.com/nomlab/sheetq](https://github.com/nomlab/sheetq)にしたがって設定を行う．
   - GoogleスプレッドシートIDを.envに設定する．
