@@ -24,5 +24,10 @@ module Swimmy
     autoload :CalendarEvent, "#{dir}/calendar_event.rb"
     autoload :ArtistInfo , "#{dir}/artist_info.rb"
     autoload :Homework,    "#{dir}/homework.rb"
+    autoload :IdName,      "#{dir}/id_name.rb"
+    autoload :Task,        "#{dir}/task.rb"
+    autoload :Document,    "#{dir}/document.rb"
+    autoload :User,        "#{dir}/user.rb"
+    autoload :Project,     "#{dir}/project.rb"
   end
 end

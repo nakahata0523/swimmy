@@ -4,9 +4,13 @@ module Swimmy
   module Service
     # Thin wrapper around the rask-cli binary (rask/cli).
     #
+    # List commands always fetch JSON under the hood and return arrays of
+    # Swimmy::Resource objects (Task/Document/User/Project) rather than raw
+    # JSON, so callers never need to think about the CLI's output format.
+    #
     # Usage (called as class methods, no need to instantiate):
-    #   Swimmy::Service::RaskCliDriver.task_list(username, is_json)
-    #   Swimmy::Service::RaskCliDriver.document_list(content: ["title"], json: true)
+    #   Swimmy::Service::RaskCliDriver.task_list(username)
+    #   Swimmy::Service::RaskCliDriver.document_list(content: ["title"])
     class RaskCliDriver
       class CommandFailedError < StandardError; end
 
@@ -22,20 +26,19 @@ module Swimmy
           run(args)
         end
 
-        # task list [--username] [--json]
-        def task_list(username = nil, is_json = false)
-          args = ["task", "list"]
+        # task list [--username] --json
+        def task_list(username = nil)
+          args = ["task", "list", "--json"]
           args += ["--username", username] if username
-          args << "--json" if is_json
 
-          run(args)
+          Resource::Task.parse_list(run(args))
         end
 
-        # document list [filters...] [--json]
+        # document list [filters...] --json
         def document_list(id: nil, content: nil, creator_id: nil, creator_name: nil, description: nil,
                            project_id: nil, project_name: nil, created_at: nil, updated_at: nil,
-                           start_at: nil, end_at: nil, term_duration: nil, is_json: false)
-          args = ["document", "list"]
+                           start_at: nil, end_at: nil, term_duration: nil)
+          args = ["document", "list", "--json"]
           args += ["--id", id.to_s] if id
           args += multi_value_option("--content", content)
           args += ["--creator-id", creator_id.to_s] if creator_id
@@ -48,25 +51,18 @@ module Swimmy
           args += ["--start-at", start_at] if start_at
           args += ["--end-at", end_at] if end_at
           args += ["--term-duration", term_duration.to_s] if term_duration
-          args << "--json" if is_json
 
-          run(args)
+          Resource::Document.parse_list(run(args))
         end
 
-        # user list [--json]
-        def user_list(is_json = false)
-          args = ["user", "list"]
-          args << "--json" if is_json
-
-          run(args)
+        # user list --json
+        def user_list
+          Resource::User.parse_list(run(["user", "list", "--json"]))
         end
 
-        # project list [--json]
-        def project_list(is_json = false)
-          args = ["project", "list"]
-          args << "--json" if is_json
-
-          run(args)
+        # project list --json
+        def project_list
+          Resource::Project.parse_list(run(["project", "list", "--json"]))
         end
 
         private
