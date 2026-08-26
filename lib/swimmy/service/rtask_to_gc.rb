@@ -20,8 +20,10 @@ module Swimmy
         github_name = NameResolver.new(@spreadsheet).name_slack_to_github(slack_name)
         raise RTaskToGcError, "ユーザ #{slack_name} のGitHubアカウントが見つかりませんでした．" if github_name.nil?
 
-        tasks = fetch_rtask_tasks(github_name)
 
+        rask_service= Service;;RaskCliDriver.new(@rask_url)
+        tasks=rask_service.task_list(github_name)
+        # tasks = fetch_rtask_tasks(github_name)
         google_oauth = Resource::GoogleOAuth.new('config/credentials.json', 'config/tokens.json')
         calendar_service = Service::GoogleCalendar.from_spreadsheet(google_oauth, @spreadsheet, "GN")
 
