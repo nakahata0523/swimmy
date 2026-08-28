@@ -21,9 +21,9 @@ module Swimmy
         raise RTaskToGcError, "ユーザ #{slack_name} のGitHubアカウントが見つかりませんでした．" if github_name.nil?
 
 
-        rask_service= Service;;RaskCliDriver.new(@rask_url)
-        tasks=rask_service.task_list(github_name)
-        # tasks = fetch_rtask_tasks(github_name)
+        #rask_service= Service;;RaskCliDriver.new(@rask_url)
+        #tasks=Service::RaskCliDriver::task_list(github_name)
+        tasks = fetch_rtask_tasks(github_name)
         google_oauth = Resource::GoogleOAuth.new('config/credentials.json', 'config/tokens.json')
         calendar_service = Service::GoogleCalendar.from_spreadsheet(google_oauth, @spreadsheet, "GN")
 

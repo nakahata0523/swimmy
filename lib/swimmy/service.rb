@@ -24,11 +24,8 @@ module Swimmy
     autoload :Numbersapi, "#{dir}/numbersapi.rb"
     autoload :GoogleCalendar, "#{dir}/schedule_service.rb"
     autoload :Spotify, "#{dir}/spotify.rb"
-<<<<<<< HEAD
-=======
     autoload :Homework, "#{dir}/homework.rb"
     autoload :RaskCliDriver, "#{dir}/rask_cli_driver.rb"
     autoload :RTaskToGc, "#{dir}/rtask_to_gc.rb"
->>>>>>> feat/rask-cli
   end
 end

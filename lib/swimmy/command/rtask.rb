@@ -10,12 +10,11 @@ module Swimmy
           user = client.web_client.users_info(user: data.user).user
           user_name = user.profile.display_name
           raise ArgumentError, "ユーザの表示名が見つかりませんでした．" if user_name.nil?
-
-          result = Swimmy::Service::RTask.new(spreadsheet,target_dir:ENV['RASK_CLI_PASS'],rask_url:ENV['RASK_URL']).list_tasks(user_name)
+          result = Swimmy::Service::RTask.new(spreadsheet,target_dir:ENV['RASK_CLI_DIR'],rask_url:ENV['RASK_URL']).list_tasks(user_name)
+          raise Swimmy::Service::RTask::RTaskError,"rtask の実行に失敗しました．" if result.nil?
           client.say(channel: data.channel, text: result)
         rescue Swimmy::Service::RTask::RTaskError => e
           client.say(channel: data.channel, text: e.message)
-   
         rescue Errno::ENOENT => e
           client.say(channel: data.channel, text: "必要なファイルまたはディレクトリが見つかりませんでした: #{e.message}")
         rescue => e

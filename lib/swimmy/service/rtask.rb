@@ -18,11 +18,12 @@ module Swimmy
       def list_tasks(slack_name)
         github_name = NameResolver.new(@spreadsheet).name_slack_to_github(slack_name)
         raise RTaskError, "ユーザ #{slack_name}の GitHub アカウントが見つかりませんでした．" if github_name.nil?
-
-        tasks = fetch_rask_tasks(github_name)
+        tasks=Service::RaskCliDriver::task_list(github_name)
+        #tasks = fetch_rask_tasks(github_name)
+        raise RTaskError, "タスクの取得に失敗しました．" if tasks.nil?
         output_tasks(tasks)
       rescue Errno::ENOENT => e
-        raise RTaskError, "必要なファイルまたはディレクトリが見つかりませんでした: #{e.message}"
+        raise RTaskError, "必要なファイルまたはディレクトリが見つかりませんでした:fe #{e.message}"
       end
 
       private
