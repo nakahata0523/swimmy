@@ -2,19 +2,19 @@ require "date"
 
 module Swimmy
   module Resource
-    class Task
+    class TaskList
       def initialize(content, due_at, assigner, url)
         @content = content
         @due_at = due_at
-        @name = assigner["name"]
+        @name = assigner.name
         @url = url.sub(/.json$/, "")
       end
 
-      def self.from_json(task_json)
-        content = task_json["content"]
-        due_at = task_json["due_at"] ? DateTime.parse(task_json["due_at"]) : nil
-        assigner = task_json["assigner"]
-        url = task_json["url"]
+      def self.from_task(task)
+        content = task.content
+        due_at = task.due_at ? DateTime.parse(task.due_at) : nil
+        assigner = task.assigner
+        url = task.url
         new(content, due_at, assigner, url)
       end
 

@@ -26,5 +26,6 @@ module Swimmy
     autoload :Spotify, "#{dir}/spotify.rb"
     autoload :Homework, "#{dir}/homework.rb"
     autoload :RaskCliDriver, "#{dir}/rask_cli_driver.rb"
+    autoload :TaskReminder, "#{dir}/task_reminder.rb"
   end
 end
