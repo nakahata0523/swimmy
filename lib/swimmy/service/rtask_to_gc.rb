@@ -37,9 +37,9 @@ module Swimmy
 
         results = []
         tasks.each do |task|
-          next unless Resource::RTaskToGc.due_this_month?(Date.today, task.due_at)
+          next unless Resource::ThisMonth.due_this_month?(Date.today, task.due_at)
 
-          event = Resource::CalendarEvent.new(task.content, Resource::RTaskToGc.start_time_as_string(task.due_at), Resource::RTaskToGc.end_time_as_string(task.due_at))
+          event = Resource::CalendarEvent.new(task.content, Resource::ThisMonth.start_time_as_string(task.due_at), Resource::ThisMonth.end_time_as_string(task.due_at))
           if event_registered?(event)
             results << { content: task.content, status: :already_registered }
           else
@@ -57,12 +57,6 @@ module Swimmy
         result = Service::RaskCliDriver.task_list(github_name)
         raise RTaskToGcError.new(:cli_empty_output) if result.empty?
         result
-      end
-
-      def parse_rtask_json(json_string)
-        JSON.parse(json_string)
-      rescue JSON::ParserError
-        raise RTaskToGcError.new(:invalid_json)
       end
 
       def event_registered?(event)
