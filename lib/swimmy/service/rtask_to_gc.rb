@@ -25,7 +25,7 @@ module Swimmy
       end
 
       def sync_rtask_to_google_calendar(slack_name)
-        github_name = NameResolver.new(@spreadsheet).name_slack_to_github(slack_name)
+        github_name = @spreadsheet.sheet("members", Resource::Member).fetch.find { |member| member.account == slack_name }&.github
         raise RTaskToGcError.new(:github_account_not_found, slack_name) if github_name.nil?
 
 
@@ -37,9 +37,9 @@ module Swimmy
 
         results = []
         tasks.each do |task|
-          next unless task.due_this_month?(Date.today)
+          next unless Resource::ThisMonth.due_this_month?(Date.today, task.due_at)
 
-          event = Resource::CalendarEvent.new(task.content, task.start_time_as_string, task.end_time_as_string)
+          event = Resource::CalendarEvent.new(task.content, Resource::ThisMonth.start_time_as_string(task.due_at), Resource::ThisMonth.end_time_as_string(task.due_at))
           if event_registered?(event)
             results << { content: task.content, status: :already_registered }
           else
@@ -54,23 +54,9 @@ module Swimmy
       private
 
       def fetch_rtask_tasks(github_name)
-        command = "./rask_cli get_tasks #{github_name} -j"
-        stdout, stderr, status = Open3.capture3(command, chdir: @target_dir)
-
-        unless status.success?
-          raise RTaskToGcError.new(:cli_failed, stderr)
-        end
-
-        raise RTaskToGcError.new(:cli_empty_output) if stdout.empty?
-
-        list = parse_rtask_json(stdout)
-        list.map { |attrs| Resource::RTaskToGc.new(attrs) }
-      end
-
-      def parse_rtask_json(json_string)
-        JSON.parse(json_string)
-      rescue JSON::ParserError
-        raise RTaskToGcError.new(:invalid_json)
+        result = Service::RaskCliDriver.task_list(github_name)
+        raise RTaskToGcError.new(:cli_empty_output) if result.empty?
+        result
       end
 
       def event_registered?(event)
@@ -82,19 +68,6 @@ module Swimmy
         end
       end
 
-      class NameResolver
-        require "sheetq"
-
-        def initialize(spreadsheet)
-          @spreadsheet = spreadsheet
-        end
-
-        def name_slack_to_github(slack_name)
-          members = @spreadsheet.sheet("members", Resource::Member).fetch
-          member = members.find { |m| m.account == slack_name }
-          member&.github
-        end
-      end
     end
   end
 end
