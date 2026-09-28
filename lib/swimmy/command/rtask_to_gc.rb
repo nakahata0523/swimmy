@@ -11,8 +11,19 @@ module Swimmy
           user_name = user.profile.display_name
           raise ArgumentError, "ユーザの表示名が見つかりませんでした。" if user_name.nil?
 
-          result = Swimmy::Service::RTaskToGc.new(spreadsheet, target_dir: ENV['RASK_CLI_DIR'], rask_url: ENV['RASK_URL']).sync_rtask_to_google_calendar(user_name)
-          client.say(channel: data.channel, text: result)
+          results = Swimmy::Service::RTaskToGc.new(spreadsheet, target_dir: ENV['RASK_CLI_DIR'], rask_url: ENV['RASK_URL']).sync_rtask_to_google_calendar(user_name)
+          message = if results.empty?
+            "同期対象のタスクはありませんでした．"
+          else
+            results.map do |result|
+              if result[:status] == :already_registered
+                "タスク『#{result[:content]}』は既にカレンダに登録されています．"
+              else
+                "タスク『#{result[:content]}』をカレンダに登録しました．"
+              end
+            end.join("\n")
+          end
+          client.say(channel: data.channel, text: message)
         rescue Swimmy::Service::RTaskToGc::RTaskToGcError => e
           client.say(channel: data.channel, text: e.message)
         rescue Errno::ENOENT => e

@@ -27,20 +27,20 @@ module Swimmy
         google_oauth = Resource::GoogleOAuth.new('config/credentials.json', 'config/tokens.json')
         calendar_service = Service::GoogleCalendar.from_spreadsheet(google_oauth, @spreadsheet, "GN")
 
-        messages = []
+        results = []
         tasks.each do |task|
           next unless task.due_this_month?(Date.today)
 
           event = Resource::CalendarEvent.new(task.content, task.start_time_as_string, task.end_time_as_string)
           if event_registered?(event)
-            messages << "タスク『#{task.content}』は既にカレンダに登録されています．"
+            results << { content: task.content, status: :already_registered }
           else
             calendar_service.add_event(event)
-            messages << "タスク『#{task.content}』をカレンダに登録しました．"
+            results << { content: task.content, status: :registered }
           end
         end
 
-        messages.empty? ? "同期対象のタスクはありませんでした．" : messages.join("\n")
+        results
       rescue Errno::ENOENT => e
         raise RTaskToGcError, "必要なファイルまたはディレクトリが見つかりませんでした: #{e.message}"
       end
