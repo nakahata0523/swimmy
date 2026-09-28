@@ -25,7 +25,7 @@ module Swimmy
       end
 
       def sync_rtask_to_google_calendar(slack_name)
-        github_name = NameResolver.new(@spreadsheet).name_slack_to_github(slack_name)
+        github_name = @spreadsheet.sheet("members", Resource::Member).fetch.find { |member| member.account == slack_name }&.github
         raise RTaskToGcError.new(:github_account_not_found, slack_name) if github_name.nil?
 
 
@@ -68,19 +68,6 @@ module Swimmy
         end
       end
 
-      class NameResolver
-        require "sheetq"
-
-        def initialize(spreadsheet)
-          @spreadsheet = spreadsheet
-        end
-
-        def name_slack_to_github(slack_name)
-          members = @spreadsheet.sheet("members", Resource::Member).fetch
-          member = members.find { |m| m.account == slack_name }
-          member&.github
-        end
-      end
     end
   end
 end
