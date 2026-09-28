@@ -1,0 +1,100 @@
+require 'open3'
+require 'json'
+require 'date'
+require 'time'
+require 'swimmy/resource'
+
+module Swimmy
+  module Service
+    class RTaskToGc
+      class RTaskToGcError < StandardError
+        attr_reader :code, :detail
+
+        def initialize(code, detail = nil)
+          @code = code
+          @detail = detail
+          super(code.to_s)
+        end
+      end
+
+
+      def initialize(spreadsheet, target_dir: RASK_CLI_DIR, rask_url: RASK_URL)
+        @spreadsheet = spreadsheet
+        @target_dir = target_dir
+        @rask_url = rask_url
+      end
+
+      def sync_rtask_to_google_calendar(slack_name)
+        github_name = NameResolver.new(@spreadsheet).name_slack_to_github(slack_name)
+        raise RTaskToGcError.new(:github_account_not_found, slack_name) if github_name.nil?
+
+
+        #rask_service= Service;;RaskCliDriver.new(@rask_url)
+        #tasks=Service::RaskCliDriver::task_list(github_name)
+        tasks = fetch_rtask_tasks(github_name)
+        google_oauth = Resource::GoogleOAuth.new('config/credentials.json', 'config/tokens.json')
+        calendar_service = Service::GoogleCalendar.from_spreadsheet(google_oauth, @spreadsheet, "nomlab")
+
+        results = []
+        tasks.each do |task|
+          next unless task.due_this_month?(Date.today)
+
+          event = Resource::CalendarEvent.new(task.content, task.start_time_as_string, task.end_time_as_string)
+          if event_registered?(event)
+            results << { content: task.content, status: :already_registered }
+          else
+            calendar_service.add_event(event)
+            results << { content: task.content, status: :registered }
+          end
+        end
+
+        results
+      end
+
+      private
+
+      def fetch_rtask_tasks(github_name)
+        command = "./rask_cli get_tasks #{github_name} -j"
+        stdout, stderr, status = Open3.capture3(command, chdir: @target_dir)
+
+        unless status.success?
+          raise RTaskToGcError.new(:cli_failed, stderr)
+        end
+
+        raise RTaskToGcError.new(:cli_empty_output) if stdout.empty?
+
+        list = parse_rtask_json(stdout)
+        list.map { |attrs| Resource::RTaskToGc.new(attrs) }
+      end
+
+      def parse_rtask_json(json_string)
+        JSON.parse(json_string)
+      rescue JSON::ParserError
+        raise RTaskToGcError.new(:invalid_json)
+      end
+
+      def event_registered?(event)
+        sheet = @spreadsheet.sheet("calendar", Resource::Calendar)
+        calendars = sheet.fetch
+        events = Service::CalendarService.new.get_events(calendars, event.name)
+        events.any? do |existing|
+          existing && existing.summary == event.name && existing.start.iso8601 == event.start.iso8601
+        end
+      end
+
+      class NameResolver
+        require "sheetq"
+
+        def initialize(spreadsheet)
+          @spreadsheet = spreadsheet
+        end
+
+        def name_slack_to_github(slack_name)
+          members = @spreadsheet.sheet("members", Resource::Member).fetch
+          member = members.find { |m| m.account == slack_name }
+          member&.github
+        end
+      end
+    end
+  end
+end
