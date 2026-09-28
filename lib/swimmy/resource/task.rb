@@ -38,11 +38,6 @@ module Swimmy
         )
       end
 
-      def due_this_month?(base_date)
-        return false unless due_at
-        due_at.year == base_date.year && due_at.month == base_date.month
-      end
-
       def url(rask_url)
         return '' if rask_url.empty? || id.nil?
         "#{rask_url}/tasks/#{id}"
@@ -51,6 +46,7 @@ module Swimmy
       def self.parse_list(json_string)
         JSON.parse(json_string).map { |hash| from_hash(hash) }
       end
+
     end
   end
 end

@@ -37,9 +37,9 @@ module Swimmy
 
         results = []
         tasks.each do |task|
-          next unless task.due_this_month?(Date.today)
+          next unless Resource::RTaskToGc.due_this_month?(Date.today, task.due_at)
 
-          event = Resource::CalendarEvent.new(task.content, task.start_time_as_string, task.end_time_as_string)
+          event = Resource::CalendarEvent.new(task.content, Resource::RTaskToGc.start_time_as_string(task.due_at), Resource::RTaskToGc.end_time_as_string(task.due_at))
           if event_registered?(event)
             results << { content: task.content, status: :already_registered }
           else
@@ -54,17 +54,9 @@ module Swimmy
       private
 
       def fetch_rtask_tasks(github_name)
-        command = "./rask_cli get_tasks #{github_name} -j"
-        stdout, stderr, status = Open3.capture3(command, chdir: @target_dir)
-
-        unless status.success?
-          raise RTaskToGcError.new(:cli_failed, stderr)
-        end
-
-        raise RTaskToGcError.new(:cli_empty_output) if stdout.empty?
-
-        list = parse_rtask_json(stdout)
-        list.map { |attrs| Resource::RTaskToGc.new(attrs) }
+        result = Service::RaskCliDriver.task_list(github_name)
+        raise RTaskToGcError.new(:cli_empty_output) if result.empty?
+        result
       end
 
       def parse_rtask_json(json_string)
