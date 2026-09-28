@@ -25,7 +25,19 @@ module Swimmy
           end
           client.say(channel: data.channel, text: message)
         rescue Swimmy::Service::RTaskToGc::RTaskToGcError => e
-          client.say(channel: data.channel, text: e.message)
+          message = case e.code
+          when :github_account_not_found
+            "ユーザ #{e.detail} のGitHubアカウントが見つかりませんでした．"
+          when :cli_failed
+            e.detail.to_s.empty? ? "rtaskの実行に失敗しましたが，エラーメッセージはありませんでした．" : e.detail
+          when :cli_empty_output
+            "rtaskの実行に成功しましたが，出力はありませんでした．"
+          when :invalid_json
+            "JSONのパースに失敗しました．出力内容を確認してください．"
+          else
+            "rtask_to_gcの実行に失敗しました．"
+          end
+          client.say(channel: data.channel, text: message)
         rescue Errno::ENOENT => e
           client.say(channel: data.channel, text: "必要なファイルまたはディレクトリが見つかりませんでした: #{e.message}")
         rescue => e
