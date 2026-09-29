@@ -5,9 +5,10 @@ Dotenv.load
 module Swimmy
   module Command
     class MinutesUploader < Swimmy::Command::Base
-      MINUTE_TYPES = %i[GN New].freeze
+      CALENDAR_MAP = { GN: 1, New: 2 }.freeze
+      MINUTE_TYPES = CALENDAR_MAP.keys.freeze
       MINUTE_CREATE_URL = "https://rask.nomlab.org/documents/new".freeze
-      private_constant :MINUTE_TYPES, :MINUTE_CREATE_URL
+      private_constant :CALENDAR_MAP, :MINUTE_TYPES, :MINUTE_CREATE_URL
 
       command "minutes_uploader" do |client, data, match|
 
@@ -17,8 +18,8 @@ module Swimmy
         MINUTE_TYPES.each do |type|
           # イベントの取得処理
           begin
-            cal_gateway = Swimmy::Service::GoogleCalendarGateway.new(type, sheet)
-            meet_event_selector = Swimmy::Service::MeetingEventSelector.new(cal_gateway)
+            cal = Swimmy::Service::GoogleCalendarGateway.new(sheet.fetch[CALENDAR_MAP[type]])
+            meet_event_selector = Swimmy::Service::MeetingEventSelector.new(cal)
             meet_event = meet_event_selector.select(Date.today)
           rescue => e
             client.say(channel: data.channel, text: "【#{type}】イベント取得でエラーが発生しました: #{e.message}")

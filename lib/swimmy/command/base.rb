@@ -37,12 +37,6 @@ module Swimmy
         Swimmy::Command.mqtt_client
       end
 
-      # You can use rask-cli driver in your command
-      # e.g. driver.task_list(username)
-      def self.driver
-        Swimmy::Service::Rask
-      end
-
       # Create help_message for your command.
       # You can use in your command, for example:
       #   command "lottery" do |client, data, match|

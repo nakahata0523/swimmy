@@ -24,9 +24,9 @@ module Swimmy
     autoload :Numbersapi, "#{dir}/numbersapi.rb"
     autoload :GoogleCalendar, "#{dir}/schedule_service.rb"
     autoload :Spotify, "#{dir}/spotify.rb"
-    autoload :GoogleCalendarGateway, "#{dir}/google_calendar_gateway.rb"
-    autoload :MeetingEventAccessor, "#{dir}/meeting_event_accessor.rb"
-    autoload :MinutesAccessor, "#{dir}/minutes_accessor.rb"
+    autoload :GoogleCalendarGateway, "#{dir}/google_calendar.rb"
+    autoload :MeetingEventSelector, "#{dir}/meeting_event_selector.rb"
+    autoload :MinutesSelector, "#{dir}/minutes_selector.rb"
     autoload :Homework, "#{dir}/homework.rb"
     autoload :Rask, "#{dir}/rask.rb"
   end
