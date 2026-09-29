@@ -29,5 +29,6 @@ module Swimmy
     autoload :MinutesAccessor, "#{dir}/minutes_accessor.rb"
     autoload :Homework, "#{dir}/homework.rb"
     autoload :RaskCliDriver, "#{dir}/rask_cli_driver.rb"
+    autoload :TaskReminder, "#{dir}/task_reminder.rb"
   end
 end
