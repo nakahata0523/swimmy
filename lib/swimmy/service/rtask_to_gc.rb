@@ -29,8 +29,8 @@ module Swimmy
         raise RTaskToGcError.new(:github_account_not_found, slack_name) if github_name.nil?
 
 
-        #rask_service= Service;;RaskCliDriver.new(@rask_url)
-        #tasks=Service::RaskCliDriver::task_list(github_name)
+        #rask_service= Service;;Rask.new(@rask_url)
+        #tasks=Service::Rask::task_list(github_name)
         tasks = fetch_rtask_tasks(github_name)
         google_oauth = Resource::GoogleOAuth.new('config/credentials.json', 'config/tokens.json')
         calendar_service = Service::GoogleCalendar.from_spreadsheet(google_oauth, @spreadsheet, "nomlab")
@@ -54,7 +54,7 @@ module Swimmy
       private
 
       def fetch_rtask_tasks(github_name)
-        result = Service::RaskCliDriver.task_list(github_name)
+        result = Service::Rask.task_list(github_name)
         raise RTaskToGcError.new(:cli_empty_output) if result.empty?
         result
       end
