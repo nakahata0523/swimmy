@@ -29,5 +29,6 @@ module Swimmy
     autoload :MinutesSelector, "#{dir}/minutes_selector.rb"
     autoload :Homework, "#{dir}/homework.rb"
     autoload :Rask, "#{dir}/rask.rb"
+    autoload :TaskReminder, "#{dir}/task_reminder.rb"
   end
 end
