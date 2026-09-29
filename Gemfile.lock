@@ -37,6 +37,8 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
+    anonymous_loader (0.1.2)
+      version_gem (~> 1.1, >= 1.1.13)
     async (1.32.1)
       console (~> 1.10)
       nio4r (~> 2.3)
@@ -46,6 +48,8 @@ GEM
     async-websocket (0.8.0)
       async-io
       websocket-driver (~> 0.7.0)
+    auth-sanitizer (0.2.2)
+      version_gem (~> 1.1, >= 1.1.10)
     base64 (0.2.0)
     benchmark (0.4.0)
     bigdecimal (3.1.9)

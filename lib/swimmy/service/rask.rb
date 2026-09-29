@@ -52,8 +52,6 @@ module Swimmy
           args += ["--end-at", end_at] if end_at
           args += ["--term-duration", term_duration.to_s] if term_duration
 
-          puts (args)
-
           Resource::Document.parse_list(run(args))
         end
 

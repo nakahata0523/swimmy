@@ -3,15 +3,15 @@ require 'date'
 module Swimmy
   module Service
     class MeetingEventSelector
-      def initialize(cal_gateway)
-        if cal_gateway.nil?
+      def initialize(cal)
+        if cal.nil?
           raise ArgumentError, "cal_gateway cannot be nil"
         end
-        unless cal_gateway.is_a?(Swimmy::Service::GoogleCalendarGateway)
+        unless cal.is_a?(Swimmy::Service::GoogleCalendarGateway)
           raise ArgumentError, "cal_gateway must be a GoogleCalendarGateway object"
         end
 
-        @cal_gateway = cal_gateway
+        @cal_gateway = cal
       end
 
       def select(date = Date.today)

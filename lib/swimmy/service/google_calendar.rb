@@ -6,14 +6,14 @@ require 'uri'
 
 module Swimmy
   module Service
-    class GoogleCalendar
+    class GoogleCalendarGateway
 
       def initialize(calendar)
         if calendar.nil?
           raise ArgumentError, "calendar cannot be nil"
         end
         unless calendar.is_a?(Swimmy::Resource::Calendar)
-          raise ArgumentError, "calendar must be a Swimmy::Resource::Calendar object"
+          raise ArgumentError, "calendar must be a Swimmy::Resource::Calendar object\n actual: #{calendar.class}"
         end
 
         @calendar = calendar

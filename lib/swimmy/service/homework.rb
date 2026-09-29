@@ -5,7 +5,7 @@ module Swimmy
       HOMEWORK_TASK_PATTERN = /--\s*>\s*\(([^!]+) !:(\d+)\)/
 
       def self.driver
-        Swimmy::Service::RaskCliDriver
+        Swimmy::Service::Rask
       end
 
       # タイトルからホームワークを取得
