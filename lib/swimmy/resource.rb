@@ -31,5 +31,8 @@ module Swimmy
     autoload :Document,    "#{dir}/document.rb"
     autoload :User,        "#{dir}/user.rb"
     autoload :Project,     "#{dir}/project.rb"
+    autoload :ThisMonth,   "#{dir}/this_month.rb"
+    autoload :RTaskToGc, "#{dir}/rtask_to_gc.rb"
+    autoload :RTask, "#{dir}/rtask.rb"
   end
 end

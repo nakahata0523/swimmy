@@ -28,6 +28,8 @@ module Swimmy
     autoload :MeetingEventSelector, "#{dir}/meeting_event_selector.rb"
     autoload :MinutesSelector, "#{dir}/minutes_selector.rb"
     autoload :Homework, "#{dir}/homework.rb"
+    autoload :RaskCliDriver, "#{dir}/rask_cli_driver.rb"
+    autoload :RTaskToGc, "#{dir}/rtask_to_gc.rb"
     autoload :Rask, "#{dir}/rask.rb"
   end
 end
